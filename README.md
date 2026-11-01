@@ -33,21 +33,20 @@ Basemap attribution for OpenFreeMap, OpenMapTiles, and OpenStreetMap appears on 
 
 Run `node --check app.js` from this project folder. Node.js is optional and is not needed to run the app.
 
-## Push this folder
+## Repository and deployment
 
-Create an empty GitHub repository, then run these commands in PowerShell. Replace `YOUR-USERNAME` and `YOUR-REPOSITORY` with your GitHub details:
+- [GitHub repository](https://github.com/Benard10/30daymapchallenge-2026-day01-points-landfall)
+- [Live app](https://benard10.github.io/30daymapchallenge-2026-day01-points-landfall/)
+
+GitHub Pages publishes the root of `main`. The `.nojekyll` file keeps this a plain static site. Changes pushed to `main` trigger a new deployment.
+
+The repository contains this Day 1 folder only. The parent master plan is outside it. `.gitignore` excludes the local `prepare_data.py`, `data/summary.json`, and Python caches; both runtime GeoJSON files and source attribution remain included.
+
+To publish future changes from this folder:
 
 ```powershell
-Set-Location -LiteralPath 'D:\Development\App Development\#30DayMapChallenge\2026\day01-points'
-git init -b main
 git add .
-git status
 git diff --cached --stat
-git commit -m "Add Landfall submarine cable atlas"
-git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-git push -u origin main
+git commit -m "Describe your changes"
+git push
 ```
-
-The `.gitignore` here excludes `prepare_data.py`, `data/summary.json`, and Python caches. Runtime files, both GeoJSON datasets, this README, and source attribution are included.
-
-Only this folder becomes the repository. The parent master plan and collection README are outside it. On GitHub, `index.html` will appear at the repository root; the local parent path `2026/day01-points` will not be included. Pushing source does not automatically publish a website.
