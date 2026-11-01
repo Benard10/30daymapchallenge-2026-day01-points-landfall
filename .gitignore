@@ -1,0 +1,7 @@
+﻿# Python-generated cache files
+__pycache__/
+*.py[cod]
+
+# Local data preparation (not needed to run the app)
+/prepare_data.py
+/data/summary.json

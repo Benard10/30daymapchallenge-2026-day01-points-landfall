@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Landfall — Submarine Cable Atlas</title>
+  <meta name="application-name" content="Landfall">
+  <meta name="theme-color" content="#242424">
+  <meta name="description" content="Explore the places where the internet meets the shore. A historical atlas of submarine cable landing points.">
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+<header><a class="brand" href="./"><span class="brand-icon">◎</span> LANDFALL<span class="edition">A geography of the invisible</span></a></header>
+<main>
+ <aside>
+  <div class="eyebrow"><span class="dot"></span> BENEATH THE SURFACE</div>
+  <h1>The internet comes ashore.</h1>
+  <p class="intro">An ocean of connections. Explore the landing points that anchor the world's submarine cable networks.</p>
+  <div class="stats"><div><strong id="total">—</strong><span>LANDING POINTS</span></div><div><strong id="countries">—</strong><span>COUNTRIES / TERRITORIES</span></div></div>
+  <label for="search">FIND A LANDING POINT</label><div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Search a city or cable…" autocomplete="off"></div>
+  <div class="filter-row"><select id="country" aria-label="Filter by country"><option value="">All countries & territories</option></select><button id="clear" title="Clear filters">Reset</button></div>
+  <div class="list-heading"><h2>Explore the hubs</h2><span id="shown" aria-live="polite">Loading…</span></div>
+  <div id="results" class="results" aria-label="Landing point results"></div>
+  <div class="source-note"><b>Network snapshot · late 2022.</b> Point size shows cable connections. Routes are schematic; status reflects the source date.</div>
+ </aside>
+ <section class="map-panel" aria-label="Interactive map of submarine cable landing points">
+  <div id="map"></div><div class="map-heading"><span>GLOBAL LANDING POINT ATLAS</span><b>Small points. A connected planet.</b></div>
+  <nav class="views" aria-label="Map views"><button data-view="world" class="active">World</button><button data-view="africa">East Africa ↗</button><button data-view="asia">Southeast Asia ↗</button></nav>
+  <div id="status" role="status">Loading historical landing points…</div>
+  <article id="detail" class="detail" hidden></article>
+  <details class="legend" open aria-label="Map legend"><summary>Legend</summary><div class="legend-content"><div class="legend-items"><span><i aria-hidden="true"></i> Landing point</span><span title="Location unconfirmed in the source"><i class="planned" aria-hidden="true"></i> Unconfirmed location</span></div><div class="sizes" aria-label="Larger circles represent more cable connections"><span class="s1" aria-hidden="true"></span><span class="s2" aria-hidden="true"></span><span class="s3" aria-hidden="true"></span><small>Fewer → more connections</small></div></div></details>
+ </section>
+</main>
+<footer><span>Data © TeleGeography via <a href="https://github.com/stevesong/open_undersea_cable_map" target="_blank" rel="noreferrer">Open Undersea Cable Map</a> · <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a></span></footer>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script><script src="https://unpkg.com/deck.gl@9.0.35/dist.min.js"></script><script src="app.js"></script>
+</body></html>
