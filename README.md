@@ -22,8 +22,3 @@ The `data/` folder contains enriched landing points (`hubs.geojson`), routes (`c
 Source and adapted datasets use [CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/). Preserve attribution, the noncommercial restriction, and share-alike terms. This license does not cover TeleGeography's current commercial datasets.
 
 Basemap attribution for OpenFreeMap, OpenMapTiles, and OpenStreetMap appears on the map. Libraries retain their own licenses; no separate application source license has been selected.
-
-## Links
-
-- [GitHub repository](https://github.com/Benard10/30daymapchallenge-2026-day01-points-landfall)
-- [Live app](https://benard10.github.io/30daymapchallenge-2026-day01-points-landfall/)
