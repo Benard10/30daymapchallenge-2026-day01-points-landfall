@@ -141,6 +141,15 @@ async function init(){
   mapResizeObserver.observe(document.querySelector('.map-panel'));
   map.on('remove',()=>mapResizeObserver.disconnect());
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+  map.addControl({
+   onAdd(){
+    this.container=document.createElement('div');
+    this.container.className='maplibregl-ctrl maplibregl-ctrl-group full-view-control';
+    this.container.append($('full-view'));
+    return this.container;
+   },
+   onRemove(){this.container.remove();}
+  },'top-right');
   $('full-view').addEventListener('click',toggleFullView);
   document.addEventListener('fullscreenchange',()=>setFullView(document.fullscreenElement===$('map-panel')));
   document.addEventListener('keydown',event=>{
