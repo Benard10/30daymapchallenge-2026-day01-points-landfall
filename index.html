@@ -23,11 +23,12 @@
   <div id="results" class="results" aria-label="Landing point results"></div>
   <div class="source-note"><b>Network snapshot · late 2022.</b> Point size shows cable connections. Routes are schematic; status reflects the source date.</div>
  </aside>
- <section class="map-panel" aria-label="Interactive map of submarine cable landing points">
+ <section id="map-panel" class="map-panel" aria-label="Interactive map of submarine cable landing points">
   <div id="map"></div><div class="map-heading"><span>GLOBAL LANDING POINT ATLAS</span><b>Small points. A connected planet.</b></div>
+  <button id="full-view" class="full-view" type="button" aria-label="Enter full map view" title="Full map view" aria-pressed="false" aria-controls="map-panel"><svg class="expand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg><svg class="collapse-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h5V3M21 8h-5V3M8 21v-5H3M16 21v-5h5"/></svg></button>
   <nav class="views" aria-label="Map views"><button data-view="world" class="active">World</button><button data-view="africa">East Africa ↗</button><button data-view="asia">Southeast Asia ↗</button></nav>
   <div id="status" role="status">Loading historical landing points…</div>
-  <article id="detail" class="detail" hidden></article>
+  <article id="detail" class="detail" role="dialog" aria-modal="false" aria-labelledby="detail-title" hidden></article>
   <details class="legend" open aria-label="Map legend"><summary>Legend</summary><div class="legend-content"><div class="legend-items"><span><i aria-hidden="true"></i> Landing point</span><span title="Location unconfirmed in the source"><i class="planned" aria-hidden="true"></i> Unconfirmed location</span></div><div class="sizes" aria-label="Larger circles represent more cable connections"><span class="s1" aria-hidden="true"></span><span class="s2" aria-hidden="true"></span><span class="s3" aria-hidden="true"></span><small>Fewer → more connections</small></div></div></details>
  </section>
 </main>

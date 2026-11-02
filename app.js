@@ -3,6 +3,42 @@ const $ = id => document.getElementById(id);
 const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let points = [], filtered = [], selected = null, map, overlay;
 let routes=null;
+let detailOpener=null;
+function closeDetails(restoreFocus=false){
+ selected=null;$('detail').hidden=true;$('map-panel').classList.remove('has-detail');
+ if(overlay)layers();
+ if(restoreFocus){
+  const target=detailOpener?.isConnected&&detailOpener!==document.body?detailOpener:$('full-view');
+  target.focus({preventScroll:true});
+ }
+}
+function focusPoint(duration=900){
+ if(!selected)return;
+ const rect=map.getContainer().getBoundingClientRect();
+ const sheet=$('detail').getBoundingClientRect();
+ const offset=window.innerWidth>1024
+  ? [-Math.min(sheet.width+28,rect.width*.45)/2,0]
+  : [0,-Math.min(Math.max(0,rect.bottom-sheet.top),rect.height*.5)/2];
+ map.flyTo({center:selected.geometry.coordinates,zoom:Math.max(map.getZoom(),4.5),offset,duration,essential:false});
+}
+function setFullView(active){
+ $('map-panel').classList.toggle('is-fullview',active);
+ const button=$('full-view');
+ button.setAttribute('aria-pressed',String(active));
+ button.setAttribute('aria-label',active?'Exit full map view':'Enter full map view');
+ button.title=active?'Exit full map view':'Full map view';
+}
+async function toggleFullView(){
+ const panel=$('map-panel');
+ if(panel.classList.contains('is-fullview')){
+  if(document.fullscreenElement===panel)await document.exitFullscreen();
+  setFullView(false);
+ }else{
+  setFullView(true);
+  // Expanded in-page mode remains usable when native fullscreen is unsupported.
+  try{if(document.fullscreenEnabled&&panel.requestFullscreen)await panel.requestFullscreen();}catch{/* Keep the in-page full view. */}
+ }
+}
 function updateRoutes(){
  if(!map.getLayer('cable-routes'))return;
  const hasFilter=Boolean($('search').value.trim()||$('country').value);
@@ -38,7 +74,7 @@ function setActiveView(name){
 function frameView(name,duration=1100){
  const preset=views[name];
  if(!preset)return;
- selected=null;$('detail').hidden=true;
+ closeDetails();
  setActiveView(name);
  const height=map.getContainer().clientHeight;
  const padding=name==='africa'
@@ -66,7 +102,7 @@ function layers() {
 function applyFilters(){
  const query=$('search').value.trim().toLocaleLowerCase(),country=$('country').value;
  filtered=points.filter(d=>(!country||d.properties.country===country)&&(!query||[d.properties.name,...d.properties.cables.map(c=>c.name)].join(' ').toLocaleLowerCase().includes(query)));
- if(selected&&!filtered.includes(selected)){selected=null;$('detail').hidden=true;}
+ if(selected&&!filtered.includes(selected))closeDetails();
  $('shown').textContent=`${filtered.length.toLocaleString()} results`;
  // Cap DOM rows, while rendering every matching point on the map.
  $('results').replaceChildren();
@@ -81,10 +117,14 @@ function applyFilters(){
 }
 function choose(d){
  setActiveView(null);
+ if($('detail').hidden)detailOpener=document.activeElement;
  selected=d;const p=d.properties,[lon,lat]=d.geometry.coordinates;
- $('detail').innerHTML=`<button class="close" aria-label="Close landing point details">×</button><div class="eyebrow">WHERE THE NETWORK MEETS LAND</div><h2>${escapeHTML(p.name.split(',')[0])}</h2><p>${escapeHTML(p.country)}<br>${Math.abs(lat).toFixed(3)}° ${lat<0?'S':'N'} / ${Math.abs(lon).toFixed(3)}° ${lon<0?'W':'E'}${p.is_tbd?'<br>Location unconfirmed in source':''}${!p.metadata_available?'<br>Cable details unavailable.':''}</p><p><b>${p.metadata_available?p.cables.length+' listed cable connections':'Cable membership unknown'}</b><br>Historical late-2022 snapshot</p><ul>${p.cables.map(c=>`<li>${escapeHTML(c.name)}<small>${c.is_planned?'Planned in source':'Not flagged planned in source'} · RFS ${escapeHTML(c.rfs_year??'unknown')}</small></li>`).join('')}</ul><p>RFS = ready for service. These source records do not establish current operation, ownership, capacity, or latency.</p>`;
- $('detail').hidden=false;$('detail').querySelector('button').onclick=()=>{selected=null;$('detail').hidden=true;layers();};
- map.flyTo({center:d.geometry.coordinates,zoom:Math.max(map.getZoom(),4.5),duration:1000,essential:false});layers();
+ $('detail').innerHTML=`<div class="detail-header"><div><div class="eyebrow">LANDING POINT</div><h2 id="detail-title">${escapeHTML(p.name.split(',')[0])}</h2><p>${escapeHTML(p.country)}</p></div><button class="close" type="button" aria-label="Close landing point details">×</button></div><div class="detail-body" tabindex="0" role="region" aria-label="Cable details"><p class="detail-coordinates">${Math.abs(lat).toFixed(3)}° ${lat<0?'S':'N'} / ${Math.abs(lon).toFixed(3)}° ${lon<0?'W':'E'}${p.is_tbd?'<br>Location unconfirmed in source':''}</p><p class="detail-count">${p.metadata_available?p.cables.length+' cable connections':'Cable details unavailable'}</p><ul>${p.cables.map(c=>`<li>${escapeHTML(c.name)}<small>${c.is_planned?'Planned in source':'Not marked planned'} · Ready for service: ${escapeHTML(c.rfs_year??'unknown')}</small></li>`).join('')}</ul><p class="detail-note">Late-2022 snapshot. Planned status and service dates reflect the source; current operation, capacity, and latency are not verified.</p></div>`;
+ $('detail').hidden=false;$('map-panel').classList.add('has-detail');
+ $('detail').querySelector('.close').onclick=()=>closeDetails(true);
+ $('detail').querySelector('.detail-body').scrollTop=0;
+ $('detail').querySelector('.close').focus({preventScroll:true});
+ focusPoint();layers();
 }
 async function init(){
  try{
@@ -96,10 +136,18 @@ async function init(){
   const mapResizeObserver=new ResizeObserver(()=>{
    map.resize();
    if(activeView)frameView(activeView,0);
+   else if(selected)focusPoint(0);
   });
   mapResizeObserver.observe(document.querySelector('.map-panel'));
   map.on('remove',()=>mapResizeObserver.disconnect());
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+  $('full-view').addEventListener('click',toggleFullView);
+  document.addEventListener('fullscreenchange',()=>setFullView(document.fullscreenElement===$('map-panel')));
+  document.addEventListener('keydown',event=>{
+   if(event.key!=='Escape')return;
+   if(!$('detail').hidden)closeDetails(true);
+   else if(!document.fullscreenElement)setFullView(false);
+  });
   map.on('load',addRoutes);
   // Routes are optional: a missing route file must not prevent point exploration.
   fetch('data/cable-routes.geojson').then(response=>{
